@@ -1,9 +1,9 @@
 import streamlit as st
 import nemo.collections.asr as nemo_asr
-import banglanltk as bnltk
 import nltk as nltk
-import re
+import os
 
+nltk.download('punkt')
 
 st.title("NLP Outcome")
 
@@ -19,6 +19,10 @@ if audio_file is not None:
 
     with st.spinner("Transcribing..."):
         if audio_file is not None:
+            # write the file in the disk
+            with open(audio_file.name, "wb") as f:
+                f.write(audio_file.getbuffer())
+
             transcriptions = asr_model.transcribe([audio_file.name])
             
             st.success("Transcription completed.")
@@ -26,7 +30,10 @@ if audio_file is not None:
             # st.write(transcriptions)
             transcribed_text = transcriptions[0]
             # tokenize the transcribed text
-            tokens = bnltk.word_tokenize(transcribed_text)
+            tokens = nltk.word_tokenize(transcribed_text)
+
+            # delete uploaded the audio file
+            os.remove(audio_file.name)
 
         else:
             st.warning("Please upload an audio file.")
